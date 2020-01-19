@@ -45,14 +45,22 @@ class ViewController: UITableViewController {
         if let jsonPetitions =  try? decoder.decode(Petitions.self, from: data){
            petitions = jsonPetitions.results
             filteredArray = petitions
-            tableView.reloadData()
+            DispatchQueue.main.async {
+                [weak self] in
+                self?.tableView.reloadData()
+
+            }
         }
     }
     
     func showError(){
+        DispatchQueue.main.async {
+            [weak self] in
         let ac = UIAlertController(title: "Error", message: "there was a problem loading the data please check your connection", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "Ok", style: .default))
-        present(ac,animated: true)
+            self?.present(ac,animated: true)
+            
+        }
     }
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return  filteredArray.count
