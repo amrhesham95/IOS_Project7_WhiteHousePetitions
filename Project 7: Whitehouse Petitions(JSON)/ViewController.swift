@@ -13,6 +13,11 @@ class ViewController: UITableViewController {
     var filteredArray = [Petition]()
     override func viewDidLoad() {
         super.viewDidLoad()
+        performSelector(inBackground: #selector(fetchJson), with: nil)
+        
+    }
+    
+    @objc func fetchJson(){
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(showAlertWithTextField))
         // Do any additional setup after loading the view.
         let urlString:String
@@ -22,45 +27,35 @@ class ViewController: UITableViewController {
         }else{
             urlString = "https://www.hackingwithswift.com/samples/petitions-2.json"
         }
-        DispatchQueue.global(qos: .userInitiated).async {
-            [weak self] in
+    
         if let url = URL(string: urlString){
             if let data = try? Data(contentsOf: url){
-                self?.parse(data: data)
-                
+                parse(data: data)
             }else{
-                self?.showError()
+                performSelector(onMainThread: #selector(showError), with: nil, waitUntilDone: false)
             }
-            
-        }else{
-            self?.showError()
-                }
                 
-            }
+        }else{
+            performSelector(onMainThread: #selector(showError), with: nil, waitUntilDone: false)
+        }
+            
     }
-    
     func parse(data:Data){
         let decoder = JSONDecoder()
-        
         if let jsonPetitions =  try? decoder.decode(Petitions.self, from: data){
            petitions = jsonPetitions.results
             filteredArray = petitions
-            DispatchQueue.main.async {
-                [weak self] in
-                self?.tableView.reloadData()
+            tableView.performSelector(onMainThread: #selector(UITableView.reloadData), with: nil, waitUntilDone: false)
+        }else{
+            performSelector(onMainThread: #selector(showError), with: nil, waitUntilDone: false)
 
-            }
         }
     }
     
-    func showError(){
-        DispatchQueue.main.async {
-            [weak self] in
+    @objc func showError(){
         let ac = UIAlertController(title: "Error", message: "there was a problem loading the data please check your connection", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "Ok", style: .default))
-            self?.present(ac,animated: true)
-            
-        }
+           present(ac,animated: true)
     }
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return  filteredArray.count
