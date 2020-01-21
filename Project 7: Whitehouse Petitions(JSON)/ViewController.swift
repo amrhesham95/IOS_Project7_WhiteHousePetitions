@@ -13,12 +13,12 @@ class ViewController: UITableViewController {
     var filteredArray = [Petition]()
     override func viewDidLoad() {
         super.viewDidLoad()
+         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(showAlertWithTextField))
         performSelector(inBackground: #selector(fetchJson), with: nil)
         
     }
     
     @objc func fetchJson(){
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(showAlertWithTextField))
         // Do any additional setup after loading the view.
         let urlString:String
         if navigationController?.tabBarItem.tag == 0{
