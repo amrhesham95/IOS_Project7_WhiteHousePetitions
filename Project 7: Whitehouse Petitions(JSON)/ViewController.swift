@@ -69,19 +69,20 @@ class ViewController: UITableViewController {
         ac.addAction(UIAlertAction(title: "Search", style: .default, handler: {
             action in
             guard let searchWord = ac.textFields?[0].text else{return}
-            self.search(word: searchWord)
+//            self.search(word: searchWord)
+            self.performSelector(inBackground: #selector(self.search), with: searchWord)
         }))
         present(ac,animated: true)
     }
     
-    func search(word:String){
+    @objc func search(word:String){
         filteredArray.removeAll()
         for petition in petitions{
             if petition.title.contains(word){
                 filteredArray.append(petition)
             }
         }
-        tableView.reloadData()
+        tableView.performSelector(onMainThread: #selector(UITableView.reloadData), with: nil, waitUntilDone: false)
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
